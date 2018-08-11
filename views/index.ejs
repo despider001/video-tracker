@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>videoTracker</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    
+
+    <style>
+    
+        audio, video {
+        display: block;
+        margin: auto;
+        }
+        .row{
+          max-width: 100%;
+        }
+    </style>
+  </head>
+  <body>
+      <div class="">
+        <div class="row">
+          <div class="col-8">
+            <h2 class="text-center my-4 text-muted">Hi <%=username %>, Welcome to videoTracker</h2>
+            <video id='video'
+              controls preload='none'
+              poster="http://media.w3.org/2010/05/bunny/poster.png" onloadstart="this.volume=0.05">
+              <source id='mp4'
+                src="http://media.w3.org/2010/05/bunny/trailer.mp4"
+                type='video/mp4'>
+              <p>Your user agent does not support the HTML5 Video element.</p>
+            </video>
+          </div>
+          <div class="col-4">
+              <div style="width:150px; height: 150px"></div>
+              <h3 class="text-info mb-0 text-center">Real time analysis</h3>
+              <hr class="mb-0">
+              <div id="result" class="pt-5">
+                
+              </div>
+        
+          </div>
+        </div>
+    
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(function () {
+  var socket = io();
+  var video =  document.getElementById("video");
+  var userName = "<%= username %>";
+  var eventArray = ["play", "pause", "seeked", "ended"];
+  var dataObj = {};
+  
+  eventArray.forEach(function(event){
+    video.addEventListener(event, function(){
+      dataObj = {
+          userName: userName,
+          videoSrc: video.currentSrc,
+          videoTime: video.currentTime,
+          eventName: event,
+          localTime: new Date()
+        }
+        dataObj.localTime = dataObj.localTime.toLocaleTimeString('en-GB');
+      socket.emit(event, dataObj);
+      var result = document.getElementById('result');
+      result.innerHTML = "";
+      result.innerHTML += "<b class='text-primary'>userName: </b>" + dataObj.userName + "<br>";
+      result.innerHTML += "<b class='text-primary'>videoSrc: </b>" + dataObj.videoSrc + "<br>";
+      result.innerHTML += "<b class='text-primary'>videoTime: </b>" + dataObj.videoTime + "<br>";
+      result.innerHTML += "<b class='text-primary'>eventName: </b>" + dataObj.eventName + "<br>";
+      result.innerHTML += "<b class='text-primary'>localTime: </b>" + dataObj.localTime + "<br>";
+      
+    });
+  });
+});
+
+</script>
+    <!-- jQuery first, then Tether, then Bootstrap JS. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+  </body>
+</html>
